@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neko Neko Store</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe3f0, #fff0f6);
+}
+
+/* HEADER */
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 10%;
+    background:white;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+/* LOGO */
+.logo-container{
+    position:relative;
+    width:120px;
+    height:120px;
+}
+
+.logo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid white;
+    box-shadow:0 5px 20px rgba(255,105,180,0.5);
+}
+
+.logo-container::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:50%;
+    height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
+    transform:skewX(-25deg);
+    animation:brillo 3s infinite;
+}
+
+@keyframes brillo{
+    0%{left:-100%;}
+    100%{left:150%;}
+}
+
+/* CART ICON */
+.cart-icon{
+    position:relative;
+    cursor:pointer;
+    font-size:26px;
+    transition:transform 0.2s;
+}
+.cart-icon:hover{
+    transform:scale(1.1);
+}
+
+#cart-count{
+    position:absolute;
+    top:-8px;
+    right:-10px;
+    background:#ff69b4;
+    color:white;
+    font-size:12px;
+    padding:4px 7px;
+    border-radius:50%;
+}
+
+/* SECTIONS */
+section{
+    padding:60px 10%;
+}
+
+h2{
+    margin-bottom:20px;
+    text-align:center;
+    font-size:2em;
+    color:#ff4d6d;
+    text-shadow: 1px 1px 2px #fff;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:25px;
+}
+
+/* CARD ANIMATION */
+.card{
+    background:white;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    overflow:hidden;
+    transition:transform 0.3s, box-shadow 0.3s, filter 0.3s;
+    position:relative;
+}
+
+.card:hover{
+    transform:translateY(-10px) scale(1.03);
+    box-shadow:0 15px 25px rgba(255,105,180,0.3);
+    filter: brightness(1.05);
+}
+
+.card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+    border-bottom:2px solid #ff69b4;
+}
+
+.card-content{
+    padding:15px;
+    text-align:center;
+}
+
+.price{
+    font-weight:bold;
+    margin:10px 0;
+    color:#ff69b4;
+}
+
+/* BUTTONS */
+.btn{
+    background:#ff69b4;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:25px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#ff85c1;
+    transform:scale(1.1);
+    box-shadow:0 5px 15px rgba(255,105,180,0.4);
+}
+
+/* CART PANEL - debajo del header */
+.carrito-panel{
+    position:fixed;
+    top:70px; /* debajo del header */
+    right:-400px;
+    width:350px;
+    height:calc(100% - 70px); /* altura menos header */
+    background:white;
+    box-shadow:-5px 0 20px rgba(0,0,0,0.3);
+    padding:20px;
+    transition:right 0.5s ease;
+    overflow-y:auto;
+    z-index:999;
+    border-radius:15px 0 0 15px;
+}
+
+.carrito-panel.active{
+    right:0;
+}
+
+.carrito-panel ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.carrito-panel li{
+    padding:8px 0;
+    border-bottom:1px solid #ffdee7;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.toast{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#ff69b4;
+    color:white;
+    padding:12px 20px;
+    border-radius:20px;
+    opacity:0;
+    transition:0.4s;
+    box-shadow:0 5px 15px rgba(255,105,180,0.5);
+}
+
+.toast.show{
+    opacity:1;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    header{
+        flex-direction:column;
+        gap:15px;
+    }
+    .carrito-panel{
+        width:90%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo-container">
+        <img src="logo.png" class="logo" alt="Logo Neko Neko Store">
+    </div>
+
+    <div>
+        <a href="https://wa.me/5210000000000" target="_blank" rel="noopener noreferrer">WhatsApp 💬</a> |
+        <a href="https://www.facebook.com/profile.php?id=61587093257625" target="_blank" rel="noopener noreferrer">Facebook 💙</a>
+    </div>
+
+    <div class="cart-icon" onclick="toggleCarrito()">
+        🛒 <span id="cart-count">0</span>
+    </div>
+</header>
+
+<!-- PRODUCTOS -->
+<section>
+<h2>Figuras Anime</h2>
+<div class="grid">
+<div class="card"><img src="naruto.jpg"><div class="card-content"><h3>Naruto</h3><div class="price">$500 MXN</div><button class="btn" onclick="agregar('Naruto',500)">Agregar</button></div></div>
+<div class="card"><img src="luffy.jpg"><div class="card-content"><h3>Luffy</h3><div class="price">$520 MXN</div><button class="btn" onclick="agregar('Luffy',520)">Agregar</button></div></div>
+<div class="card"><img src="nezuko.jpg"><div class="card-content"><h3>Nezuko</h3><div class="price">$490 MXN</div><button class="btn" onclick="agregar('Nezuko',490)">Agregar</button></div></div>
+<div class="card"><img src="anya.jpg"><div class="card-content"><h3>Anya</h3><div class="price">$470 MXN</div><button class="btn" onclick="agregar('Anya',470)">Agregar</button></div></div>
+<div class="card"><img src="sailormoon.jpg"><div class="card-content"><h3>Sailor Moon</h3><div class="price">$460 MXN</div><button class="btn" onclick="agregar('Sailor Moon',460)">Agregar</button></div></div>
+</div>
+</section>
+
+<section>
+<h2>Tazas</h2>
+<div class="grid">
+<div class="card"><img src="taza1.jpg"><div class="card-content"><h3>Taza Anime</h3><div class="price">$50 MXN</div><button class="btn" onclick="agregar('Taza Anime',50)">Agregar</button></div></div>
+</div>
+</section>
+
+<section>
+<h2>Pines</h2>
+<div class="grid">
+<div class="card"><img src="pin1.jpg"><div class="card-content"><h3>Pin</h3><div class="price">$10 MXN</div><button class="btn" onclick="agregar('Pin',10)">Agregar</button></div></div>
+</div>
+</section>
+
+<section>
+<h2>Posters</h2>
+<div class="grid">
+<div class="card"><img src="poster1.jpg"><div class="card-content"><h3>Poster Anime</h3><div class="price">$25 MXN</div><button class="btn" onclick="agregar('Poster Anime',25)">Agregar</button></div></div>
+</div>
+</section>
+
+<section>
+<h2>Mangas</h2>
+<div class="grid">
+<div class="card"><img src="manga1.jpg"><div class="card-content"><h3>Manga Vol.1</h3><div class="price">$200 MXN</div><button class="btn" onclick="agregar('Manga Vol.1',200)">Agregar</button></div></div>
+</div>
+</section>
+
+<section>
+<h2>Playeras</h2>
+<div class="grid">
+<div class="card"><img src="playera1.jpg"><div class="card-content"><h3>Playera Otaku</h3><div class="price">$200 MXN</div><button class="btn" onclick="agregar('Playera Otaku',200)">Agregar</button></div></div>
+</div>
+</section>
+
+<!-- CARRITO PANEL -->
+<div id="carrito-panel" class="carrito-panel">
+<h3>Tu carrito 🐱</h3>
+<ul id="lista-carrito"></ul>
+<p>Total: $<span id="total">0</span> MXN</p>
+<button class="btn" onclick="pagar()">Pagar con Mercado Pago</button>
+<button class="btn" onclick="pedirWhatsApp()">Enviar por WhatsApp</button>
+<button class="btn" onclick="cerrarCarrito()" style="background:#ff4d6d;margin-top:10px;">Cerrar Carrito</button>
+</div>
+
+<div id="toast" class="toast">Producto agregado 💖</div>
+
+<script>
+let carrito = [];
+let total = 0;
+
+function agregar(nombre, precio){
+    carrito.push({nombre, precio});
+    total += precio;
+    actualizarCarrito();
+    renderCarrito();
+    mostrarToast();
+    document.getElementById("carrito-panel").classList.add("active");
+}
+
+function actualizarCarrito(){
+    document.getElementById("cart-count").innerText = carrito.length;
+}
+
+function mostrarToast(){
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(()=>{ toast.classList.remove("show"); },2000);
+}
+
+function toggleCarrito(){
+    document.getElementById("carrito-panel").classList.toggle("active");
+}
+
+function cerrarCarrito(){
+    document.getElementById("carrito-panel").classList.remove("active");
+}
+
+function renderCarrito(){
+    const lista = document.getElementById("lista-carrito");
+    lista.innerHTML = "";
+    if(carrito.length === 0){
+        lista.innerHTML = "<p>Tu carrito está vacío 🐾</p>";
+    }
+    carrito.forEach((item,index)=>{
+        const li = document.createElement("li");
+        li.innerHTML = `${item.nombre} - $${item.precio} <button onclick="eliminar(${index})" style="margin-left:10px;background:#ff4d6d;color:white;border:none;border-radius:10px;padding:5px 8px;cursor:pointer;">X</button>`;
+        lista.appendChild(li);
+    });
+    document.getElementById("total").innerText = total;
+}
+
+function eliminar(index){
+    total -= carrito[index].precio;
+    carrito.splice(index,1);
+    renderCarrito();
+    actualizarCarrito();
+}
+
+function pagar(){
+    if(carrito.length === 0){
+        alert("Tu carrito está vacío 🐱");
+        return;
+    }
+    window.open("http://link.mercadopago.com.mx/nekonekostore", "_blank");
+    carrito = [];
+    total = 0;
+    renderCarrito();
+    actualizarCarrito();
+}
+
+function pedirWhatsApp(){
+    if(carrito.length === 0){
+        alert("Tu carrito está vacío 🐱");
+        return;
+    }
+    let mensaje = "Hola! Quiero hacer este pedido:%0A";
+    carrito.forEach(item=>{
+        mensaje += `- ${item.nombre} - $${item.precio} MXN%0A`;
+    });
+    mensaje += `Total: $${total} MXN`;
+    window.open(`https://wa.me/5210000000000?text=${mensaje}`, "_blank");
+}
+</script>
+
+</body>
+</html>
